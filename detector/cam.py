@@ -8,8 +8,3 @@ def camra():
     if (not return_value):
         raise Exception("camera disconnected")
     return image
-"""def main():
-    m=camra()
-    cv2.imwrite('m'+ '.png', m)
-if __name__ == "__main__":
-    main()"""
