@@ -1,6 +1,8 @@
 import json
 import datetime
-import config
+import logging
+
+from db import config
 
 
 '''
@@ -12,14 +14,20 @@ birds_data = {
  }
 '''
 
-
 def store_data(data_birds: dict) -> None:
     """
     The function get a dictionary include data about birds, and save it into a json file
     :param data_birds: Dictionary with data about birds
     """
-    with open(config.DB_OF_BIRDS, 'w') as json_file:
-        json.dump(data_birds, json_file)
+    try:
+        with open(config.DB_OF_BIRDS, 'r') as json_file:
+            existing_data = json.load(json_file)
+        existing_data.append(data_birds)
+        with open(config.DB_OF_BIRDS, 'w') as json_file:
+            json.dump(existing_data, json_file)
+        logging.info(f"Data saved successfully.")
+    except Exception as e:
+        logging.error("Failed to store data: %s", e)
 
 
 def get_data(since: datetime, to: datetime) -> list[dict]:

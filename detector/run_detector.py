@@ -11,7 +11,6 @@ from detector.cam import take_image
 from detector.neural_network_accses import process_image
 from detector.const import BIRDS_COUNT_THRESHOLD
 
-logging.basicConfig(filename='detector.log', level=logging.INFO, format='%(asctime)s %(message)s')
 
 
 def main():
@@ -40,4 +39,5 @@ def main():
 
 
 if __name__ == '__main__':
+    logging.basicConfig(filename='detector.log', level=logging.INFO, format='%(asctime)s %(message)s')
     main()
