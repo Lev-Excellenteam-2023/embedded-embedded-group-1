@@ -1,17 +1,15 @@
+import logging
+
 from flask import Flask, jsonify, request
 import requests
+from server.server_consts import SERVER_PORT
+from db.utils_for_data import store_data
 
 app = Flask(__name__)
 
-BIRDS_THRESHOLD = 5
 
 
-@app.route('/')
-def home():
-    return "hello"
 
-
-#  json file{camera_id, time, birds_sum}
 @app.route('/get_alert', methods=['POST'])
 def listener():
     """
@@ -19,9 +17,10 @@ def listener():
     :return:
     """
     try:
+        logging.info("Received alert from detector.")
         json_data = request.json
-        print(json_data)
-        notify_user(json_data)
+        store_data(json_data)
+        # notify_user(json_data)
         #database.savedata(json_data)
         return jsonify({"message": "alert processed successfully"})
     except Exception as e:
@@ -44,4 +43,5 @@ def notify_user(json_data):
 
 
 if __name__ == '__main__':
-    app.run(debug=True)
+    logging.basicConfig(filename='server.log', level=logging.INFO, format='%(asctime)s %(message)s')
+    app.run(debug=True, port=SERVER_PORT)
