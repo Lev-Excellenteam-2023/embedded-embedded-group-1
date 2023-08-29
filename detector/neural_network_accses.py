@@ -44,5 +44,8 @@ def process_image(image):
     except ModelInitializationError:
         logging.error("Model initialization failed.")
         return None
+    except Exception as e:
+        logging.error("Failed to process image: %s", e)
+        raise e
 
 

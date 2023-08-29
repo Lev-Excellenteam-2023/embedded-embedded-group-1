@@ -5,24 +5,28 @@ DOD: a funnction that get num of birds and timstamp and send an http message to 
 import logging
 
 import requests
-import json
-import const
-logging.basicConfig(filename="log.txt",level=logging.INFO)
+from detector.const import SERVER_URL, CAMERA_ID
 
-def send_bird_alert(camera_id, timestamp, birds_count):
 
-    server_url = const.server_url
+def send_bird_alert(timestamp, birds_count):
+    """
+    this function send alert to server when there is a folk of birds in the processed image.
+    :param timestamp: time of the alert.
+    :param birds_count: number of birds in the image.
+    :return: None
+    """
+    logging.info(f"Sending alert. Timestamp: {timestamp}, Birds count: {birds_count}")
     data = {
-        "camera_id": camera_id,
+        "camera_id": CAMERA_ID,
         "time": timestamp,
         "birds_sum": birds_count
     }
 
     try:
-        response = requests.post(server_url, json=data)
+        response = requests.post(SERVER_URL, json=data)
         if response.status_code == 200:
-          logging.info("Alert sent successfully.")
+            logging.info("Alert sent successfully.")
         else:
-            logging.info(f"Failed to send alert. Status code: {response.status_code}")
+            logging.error(f"Failed to send alert. Status code: {response.status_code}")
     except requests.exceptions.RequestException as e:
-        logging.info(f"Error sending alert: {e}")
+        logging.error(f"Error sending alert: {e}")
