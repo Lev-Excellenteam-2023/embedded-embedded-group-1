@@ -55,3 +55,11 @@ def get_num_of_birds_per_hour(num_of_days: int = 30) -> dict:
         hour = entry_datetime.hour
         hour_counts[hour] += entry["birds_sum"]
     return hour_counts
+
+
+def api_get_data_between_two_times(since: datetime, to: datetime) -> list[dict]:
+    """
+    Returns data received between 'since' and 'to'
+    """
+    birds_data = get_data(since, to)
+    return birds_data
