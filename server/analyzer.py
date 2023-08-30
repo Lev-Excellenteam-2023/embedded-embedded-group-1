@@ -20,7 +20,7 @@ def api_hour_with_most_birds(num_of_days: int = 30) -> str:
     return message
 
 
-def api_hours_with_high_birds_average(num_of_birds: float = 40, num_of_days: int = 30) -> str:
+def api_hours_with_high_birds_average(num_of_birds: float = 5, num_of_days: int = 30) -> str:
     average_counts = hours_with_high_birds_average(num_of_birds, num_of_days)
     if not average_counts:
         message = 'There are no information'
