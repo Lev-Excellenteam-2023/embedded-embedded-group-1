@@ -4,7 +4,10 @@ from db.utils_for_data import get_data
 
 
 def hour_with_most_birds(num_of_days: int = 30) -> [int, float]:
-    hour_counts = get_hours_and_num_of_birds(num_of_days)
+    """
+    Returns the hour when there were most birds in the last days
+    """
+    hour_counts = get_num_of_birds_per_hour(num_of_days)
     most_birds_hour = max(hour_counts, key=hour_counts.get)
 
     return most_birds_hour, hour_counts[most_birds_hour]/num_of_days
@@ -29,13 +32,21 @@ def api_hours_with_high_birds_average(num_of_birds: float = 40, num_of_days: int
 
 
 def hours_with_high_birds_average(num_of_birds: float, num_of_days: int = 30) -> dict:
-    hour_counts = get_hours_and_num_of_birds(num_of_days)
+    """
+    Returns the hours in the last days, where the average number of birds per hour is higher than num_of_birds
+    """
+    hour_counts = get_num_of_birds_per_hour(num_of_days)
     average_counts = {hour: counts/num_of_days for hour, counts in hour_counts.items()
                       if counts/num_of_days >= num_of_birds}
     return average_counts
 
 
-def get_hours_and_num_of_birds(num_of_days: int = 30) -> dict:
+def get_num_of_birds_per_hour(num_of_days: int = 30) -> dict:
+    """
+    The function gets a number, and sums up the number of birds observed each hour on the above number of days
+    :param num_of_days: number of last days
+    :return: A dictionary - the keys are the hours, and the values are the number of birds
+    """
     birds_data = get_data(datetime.datetime.now() - datetime.timedelta(days=num_of_days + 1),
                           datetime.datetime.now())
     hour_counts = defaultdict(int)
@@ -44,12 +55,3 @@ def get_hours_and_num_of_birds(num_of_days: int = 30) -> dict:
         hour = entry_datetime.hour
         hour_counts[hour] += entry["birds_sum"]
     return hour_counts
-
-
-def main():
-    print(api_hours_with_high_birds_average(6, 2))
-    print(api_hour_with_most_birds())
-
-
-if __name__ == "__main__":
-    main()
