@@ -50,6 +50,8 @@
             <h2>Change Threshold</h2>
             <input type="number" id="threshold-input" placeholder="Enter threshold">
             <button id="threshold-button">Set Threshold</button>
+			<div id="updateStatus"></div> 
+
         </div>
 
         <div class="information">
@@ -63,8 +65,11 @@
 
     <script>
         const messageList = document.getElementById('message-list');
+
         const thresholdInput = document.getElementById('threshold-input');
         const thresholdButton = document.getElementById('threshold-button');
+		const updateStatusDiv = document.getElementById('updateStatus'); // Add this line
+
         const infoButton = document.getElementById('info-button');
         const infoBox = document.getElementById('info-box');
 
@@ -74,7 +79,7 @@
                 const data = await response.json();
 
                 if (response.ok) {
-                    messageList.innerHTML = '';  // Clear the existing list
+                    messageList.innerHTML = '';  
 
                     data.messages.forEach(message => {
                         const li = document.createElement('li');
@@ -90,13 +95,40 @@
         updateMessagesList();
         setInterval(updateMessagesList, 3000);
 
-        // this need to complete
         thresholdButton.addEventListener('click', async () => {
-            const newThreshold = parseInt(thresholdInput.value);
-            console.log('New threshold:', newThreshold);
+		const inputValue = thresholdInput.value;
+		
+		if (/^\d+$/.test(inputValue) && parseInt(inputValue) > 0) {
+			const newThreshold = parseInt(inputValue);
+			console.log('New threshold:', newThreshold);
 
-            thresholdInput.value = '';  
-        });
+			const response = await fetch('/update_threshold', {
+				method: 'POST',
+				headers: {
+					'Content-Type': 'application/json'
+				},
+				body: JSON.stringify({ threshold: newThreshold })
+			});
+
+			if (response.ok) {
+				updateStatusDiv.textContent = 'Update success.';
+				thresholdInput.value = '';
+
+				setTimeout(() => {
+					updateStatusDiv.textContent = '';
+				}, 3000);
+			} else {
+				console.error('Failed to update threshold on server.');
+			}
+		} else {
+			updateStatusDiv.textContent = 'Please enter a positive number.';
+			setTimeout(() => {
+				updateStatusDiv.textContent = '';
+			}, 3000);
+		}
+	});
+
+		
 
         infoButton.addEventListener('click', () => {
             infoBox.style.display = 'block';
