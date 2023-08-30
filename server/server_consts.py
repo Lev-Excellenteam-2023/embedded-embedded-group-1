@@ -1,1 +1,4 @@
 SERVER_PORT = 5000
+CLIENT_URL = "http://127.0.0.1:5001"
+
+

@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Birds Detector</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 20px;
+        }
+        header {
+            background-color: #333;
+            color: #fff;
+            padding: 10px;
+            text-align: center;
+        }
+        .container {
+            display: flex;
+            justify-content: space-between;
+        }
+        .messages {
+            flex: 1;
+        }
+        .threshold {
+            flex: 1;
+            padding: 10px;
+            background-color: #f4f4f4;
+            border: 1px solid #ccc;
+        }
+        .information {
+            flex: 1;
+            padding: 10px;
+            background-color: #f4f4f4;
+            border: 1px solid #ccc;
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <h1>Birds Detector</h1>
+    </header>
+
+    <div class="container">
+        <div class="messages">
+            <h2>Received Alerts:</h2>
+            <ul id="message-list"></ul>
+        </div>
+
+        <div class="threshold">
+            <h2>Change Threshold</h2>
+            <input type="number" id="threshold-input" placeholder="Enter threshold">
+            <button id="threshold-button">Set Threshold</button>
+        </div>
+
+        <div class="information">
+            <h2>Information</h2>
+            <button id="info-button">Show Information</button>
+            <div id="info-box" style="display: none;">
+                <p>This is an information box. You can display additional details here.</p>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const messageList = document.getElementById('message-list');
+        const thresholdInput = document.getElementById('threshold-input');
+        const thresholdButton = document.getElementById('threshold-button');
+        const infoButton = document.getElementById('info-button');
+        const infoBox = document.getElementById('info-box');
+
+        // Function to update the received messages list
+        async function updateMessagesList() {
+            try {
+                const response = await fetch('/get_messages');
+                const data = await response.json();
+
+                if (response.ok) {
+                    messageList.innerHTML = '';  // Clear the existing list
+
+                    // Add each message to the list
+                    data.messages.forEach(message => {
+                        const li = document.createElement('li');
+                        li.textContent = message;
+                        messageList.appendChild(li);
+                    });
+                }
+            } catch (error) {
+                console.error('Error updating messages list:', error);
+            }
+        }
+
+        // Call the function initially and every 5 seconds
+        updateMessagesList();
+        setInterval(updateMessagesList, 5000);
+
+        // Button click event to change threshold
+        thresholdButton.addEventListener('click', async () => {
+            const newThreshold = parseInt(thresholdInput.value);
+            console.log('New threshold:', newThreshold);
+
+            // You can send the newThreshold to the server if needed
+            // Example: await fetch('/change_threshold', { method: 'POST', body: JSON.stringify({ threshold: newThreshold }) });
+
+            thresholdInput.value = '';  // Clear the input
+        });
+
+        // Button click event to show information box
+        infoButton.addEventListener('click', () => {
+            infoBox.style.display = 'block';
+        });
+    </script>
+</body>
+</html>
