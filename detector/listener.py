@@ -4,6 +4,7 @@ this file is used to listen to the port and receive requests from the server to 
 import logging
 
 from flask import Flask, jsonify, request
+from detector.const import LISTENER_PORT
 
 
 app = Flask(__name__)
@@ -14,7 +15,7 @@ threshold = [0]
 def listener():
     """
     get alert from the detector
-    :return:
+    :return: None
     """
     try:
         global threshold
@@ -40,4 +41,4 @@ def run_listener(_threshold):
     global threshold
     threshold = _threshold
     logging.info("Starting listener.")
-    app.run(debug=False, port=5009, use_reloader=False)
+    app.run(debug=False, port=LISTENER_PORT, use_reloader=False)

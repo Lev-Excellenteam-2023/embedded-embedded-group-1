@@ -2,7 +2,7 @@ import logging
 
 from flask import Flask, jsonify, request
 import requests
-from server.server_consts import SERVER_PORT, CLIENT_URL
+from server.server_consts import SERVER_PORT, CLIENT_URL, DETECTOR_URL, DETECTOR_CHANGE_THRESHOLD_PATH
 from db.utils_for_data import store_data
 
 app = Flask(__name__)
@@ -21,6 +21,30 @@ def listener():
         notify_user(json_data)
         return jsonify({"message": "alert processed successfully"})
     except Exception as e:
+        logging.error(f"Failed to process alert. Error: {e}")
+        return jsonify({"error": str(e)})
+
+
+@app.route('/change_threshold', methods=['POST'])
+def change_threshold():
+    """
+    get request from the client to change the threshold
+    and send it to the detector
+    :return: None
+    """
+    try:
+        json_data = request.json
+        new_threshold = json_data["threshold"]
+        logging.info(f"Received request from client to change threshold to {new_threshold}")
+        response = requests.post(f"{DETECTOR_URL}{DETECTOR_CHANGE_THRESHOLD_PATH}", json=json_data)
+        if response.status_code == 200:
+            logging.info("Threshold changed successfully.")
+            return jsonify({"message": "threshold changed successfully"})
+        else:
+            logging.error(f"Failed to change threshold. Status code: {response.status_code}")
+            return jsonify({"error": "failed to change threshold"})
+    except Exception as e:
+        logging.error(f"Failed to change threshold. Error: {e}")
         return jsonify({"error": str(e)})
 
 
@@ -32,11 +56,11 @@ def notify_user(json_data):
         msg = "camera {} identify {} birds at {}".format(camera, birds_sum, time)
         response = requests.post(CLIENT_URL, data=msg)
         if response.status_code == 200:
-            print("JSON data sent successfully to the client.")
+            logging.info("JSON data sent successfully.")
         else:
-            print(f"Failed to send JSON data. Status code: {response.status_code}")
+            logging.error(f"Failed to send JSON data. Status code: {response.status_code}")
     except Exception as e:
-        print(f"Error sending JSON data: {str(e)}")
+        logging.error(f"Failed to send JSON data. Error: {e}")
 
 
 if __name__ == '__main__':
