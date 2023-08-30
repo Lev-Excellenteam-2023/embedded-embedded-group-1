@@ -57,6 +57,32 @@ def get_num_of_birds_per_hour(num_of_days: int = 30) -> dict:
     return hour_counts
 
 
+def get_months_in_year_with_lot_of_birds(num_of_birds: int = 100) -> list[int]:
+    """
+    Returns a list of months with a lot of birds
+    """
+    birds_data = get_data(datetime.datetime.now() - datetime.timedelta(days=365),
+                          datetime.datetime.now())
+    month_counts = defaultdict(int)
+    for entry in birds_data:
+        entry_datetime = datetime.datetime.strptime(entry["time"], "%d/%m/%Y %H:%M:%S")
+        month = entry_datetime.month
+        month_counts[month] += entry["birds_sum"]
+    months = [key for key in month_counts if month_counts[key]>=num_of_birds]
+    return months
+
+
+def report_month_with_lot_of_birds() -> str:
+    """
+    Returns a report if there may be many birds in the area
+    """
+    months = get_months_in_year_with_lot_of_birds()
+    message = ''
+    if datetime.datetime.now().month in months:
+        message = 'Note!\nDuring this period there may be many birds in the area!'
+    return message
+  
+  
 def api_get_data_between_two_times(since: datetime, to: datetime) -> list[dict]:
     """
     Returns data received between 'since' and 'to'
