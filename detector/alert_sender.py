@@ -5,7 +5,7 @@ DOD: a funnction that get num of birds and timstamp and send an http message to 
 import logging
 
 import requests
-from detector.const import SERVER_URL, CAMERA_ID
+from detector.const import SERVER_URL, SERVER_GET_ALERT_PATH, CAMERA_ID
 
 
 def send_bird_alert(timestamp, birds_count):
@@ -23,7 +23,7 @@ def send_bird_alert(timestamp, birds_count):
     }
 
     try:
-        response = requests.post(SERVER_URL, json=data)
+        response = requests.post(f"{SERVER_URL}{SERVER_GET_ALERT_PATH}", json=data)
         if response.status_code == 200:
             logging.info("Alert sent successfully.")
         else:
