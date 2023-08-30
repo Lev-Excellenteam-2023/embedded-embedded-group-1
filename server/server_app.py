@@ -2,7 +2,7 @@ import logging
 
 from flask import Flask, jsonify, request
 import requests
-from server.server_consts import SERVER_PORT
+from server.server_consts import SERVER_PORT, CLIENT_URL
 from db.utils_for_data import store_data
 
 app = Flask(__name__)
@@ -26,11 +26,11 @@ def listener():
 
 def notify_user(json_data):
     try:
-        # Replace this URL with the URL of the Control Tower
-        client_url = "http://127.0.0.1:5000"
-
-        msg="camera {} identify {} birds".format(json_data.get('camera_id'),json_data.get('birds_sum'))
-        response = requests.post(client_url, msg)
+        camera = json_data.get('camera_id')
+        birds_sum = json_data.get('birds_sum')
+        time = json_data.get('time')
+        msg = "camera {} identify {} birds at {}".format(camera, birds_sum, time)
+        response = requests.post(CLIENT_URL, data=msg)
         if response.status_code == 200:
             print("JSON data sent successfully to the client.")
         else:
