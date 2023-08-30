@@ -68,7 +68,6 @@
         const infoButton = document.getElementById('info-button');
         const infoBox = document.getElementById('info-box');
 
-        // Function to update the received messages list
         async function updateMessagesList() {
             try {
                 const response = await fetch('/get_messages');
@@ -77,7 +76,6 @@
                 if (response.ok) {
                     messageList.innerHTML = '';  // Clear the existing list
 
-                    // Add each message to the list
                     data.messages.forEach(message => {
                         const li = document.createElement('li');
                         li.textContent = message;
@@ -89,22 +87,17 @@
             }
         }
 
-        // Call the function initially and every 5 seconds
         updateMessagesList();
         setInterval(updateMessagesList, 3000);
 
-        // Button click event to change threshold
+        // this need to complete
         thresholdButton.addEventListener('click', async () => {
             const newThreshold = parseInt(thresholdInput.value);
             console.log('New threshold:', newThreshold);
 
-            // You can send the newThreshold to the server if needed
-            // Example: await fetch('/change_threshold', { method: 'POST', body: JSON.stringify({ threshold: newThreshold }) });
-
-            thresholdInput.value = '';  // Clear the input
+            thresholdInput.value = '';  
         });
 
-        // Button click event to show information box
         infoButton.addEventListener('click', () => {
             infoBox.style.display = 'block';
         });
