@@ -96,42 +96,56 @@
         setInterval(updateMessagesList, 3000);
 
         thresholdButton.addEventListener('click', async () => {
-		const inputValue = thresholdInput.value;
-		
-		if (/^\d+$/.test(inputValue) && parseInt(inputValue) > 0) {
-			const newThreshold = parseInt(inputValue);
-			console.log('New threshold:', newThreshold);
+			const inputValue = thresholdInput.value;
+			
+			if (/^\d+$/.test(inputValue) && parseInt(inputValue) > 0) {
+				const newThreshold = parseInt(inputValue);
+				console.log('New threshold:', newThreshold);
 
-			const response = await fetch('/update_threshold', {
-				method: 'POST',
-				headers: {
-					'Content-Type': 'application/json'
-				},
-				body: JSON.stringify({ threshold: newThreshold })
-			});
+				const response = await fetch('/update_threshold', {
+					method: 'POST',
+					headers: {
+						'Content-Type': 'application/json'
+					},
+					body: JSON.stringify({ threshold: newThreshold })
+				});
 
-			if (response.ok) {
-				updateStatusDiv.textContent = 'Update success.';
-				thresholdInput.value = '';
+				if (response.ok) {
+					updateStatusDiv.textContent = 'Update success.';
+					thresholdInput.value = '';
 
+					setTimeout(() => {
+						updateStatusDiv.textContent = '';
+					}, 3000);
+				} else {
+					console.error('Failed to update threshold on server.');
+				}
+			} else {
+				updateStatusDiv.textContent = 'Please enter a positive number.';
 				setTimeout(() => {
 					updateStatusDiv.textContent = '';
 				}, 3000);
-			} else {
-				console.error('Failed to update threshold on server.');
 			}
-		} else {
-			updateStatusDiv.textContent = 'Please enter a positive number.';
-			setTimeout(() => {
-				updateStatusDiv.textContent = '';
-			}, 3000);
-		}
-	});
+			});
 
 		
+	infoButton.addEventListener('click', async () => {
+		// Make an asynchronous request to the Flask route
+		const response = await fetch('/get_info', {
+			method: 'GET',
+			headers: {
+				'Content-Type': 'application/json'
+			}
+		});
 
-        infoButton.addEventListener('click', () => {
-            infoBox.style.display = 'block';
+		if (response.ok) {
+			// Parse the JSON response and update the infoBox content
+			const data = await response.json();
+			infoBox.textContent = data.info;
+			infoBox.style.display = 'block';
+		} else {
+			console.error('Failed to retrieve info from server.');
+		}
         });
     </script>
 </body>

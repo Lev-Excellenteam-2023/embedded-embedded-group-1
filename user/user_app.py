@@ -3,7 +3,7 @@ import logging
 from flask import Flask, jsonify, request, render_template
 import requests
 
-from user.consts import SERVER_URL, SERVER_CHANGE_THR_PATH
+from user.consts import SERVER_URL, SERVER_CHANGE_THR_PATH, SERVER_GET_REPO_PATH
 
 app = Flask(__name__)
 
@@ -23,7 +23,7 @@ def root_handler():
     """
     try:
         msg = request.data.decode('utf-8')
-        print(msg)
+        logging.info(msg)
         received_messages.append(msg)
         return jsonify({"message": "JSON data processed successfully"})
     except Exception as e:
@@ -37,6 +37,7 @@ def get_messages():
     :return:
     """
     return jsonify({"messages": received_messages})
+
 
 @app.route('/update_threshold', methods=['POST'])
 def update_threshold():
@@ -52,6 +53,22 @@ def update_threshold():
         if response.status_code == 200:
             logging.info("Threshold changed successfully.")
         return jsonify({"message": "Threshold updated successfully"})
+    except Exception as e:
+        return jsonify({"error": str(e)})
+
+
+@app.route('/get_info', methods=['GET'])
+def get_info():
+    """
+    send request from to the server to get report and print it
+    :return:
+    """
+    try:
+        response = requests.get(f"{SERVER_URL}{SERVER_GET_REPO_PATH}")
+        response_data = response.json()
+        updated_info = response_data.get("message", "No information available")
+        logging.info(f"info received: {updated_info}")
+        return jsonify({"info": updated_info})
     except Exception as e:
         return jsonify({"error": str(e)})
 
