@@ -4,7 +4,7 @@ this file is used to listen to the port and receive requests from the server to 
 import logging
 
 from flask import Flask, jsonify, request
-from detector.const import LISTENER_PORT
+from const import LISTENER_PORT
 
 
 app = Flask(__name__)

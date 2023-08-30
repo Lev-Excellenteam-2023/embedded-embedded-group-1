@@ -7,11 +7,11 @@ import time
 from datetime import datetime
 import threading
 
-from detector.alert_sender import send_bird_alert
-from detector.cam import take_image
-from detector.neural_network_accses import process_image
-from detector.listener import run_listener
-from detector.const import BIRDS_COUNT_THRESHOLD, INTERVAL
+from alert_sender import send_bird_alert
+from cam import take_image
+from neural_network_accses import process_image
+from listener import run_listener
+from const import BIRDS_COUNT_THRESHOLD, INTERVAL
 
 
 def main():

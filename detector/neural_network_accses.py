@@ -4,7 +4,7 @@ for the purpose of detecting birds in the image
 """
 import logging
 from roboflow import Roboflow
-from detector.const import API_KEY, PROJECT_NAME, CONFIDENCE_THRESHOLD, OVERLAP_THRESHOLD
+from const import API_KEY, PROJECT_NAME, CONFIDENCE_THRESHOLD, OVERLAP_THRESHOLD
 
 MODEL = None
 

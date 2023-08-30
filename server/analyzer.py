@@ -20,7 +20,7 @@ def api_hour_with_most_birds(num_of_days: int = 30) -> str:
     return message
 
 
-def api_hours_with_high_birds_average(num_of_birds: float = 40, num_of_days: int = 30) -> str:
+def api_hours_with_high_birds_average(num_of_birds: float = 5, num_of_days: int = 30) -> str:
     average_counts = hours_with_high_birds_average(num_of_birds, num_of_days)
     if not average_counts:
         message = 'There are no information'
@@ -81,3 +81,11 @@ def report_month_with_lot_of_birds() -> str:
     if datetime.datetime.now().month in months:
         message = 'Note!\nDuring this period there may be many birds in the area!'
     return message
+  
+  
+def api_get_data_between_two_times(since: datetime, to: datetime) -> list[dict]:
+    """
+    Returns data received between 'since' and 'to'
+    """
+    birds_data = get_data(since, to)
+    return birds_data
