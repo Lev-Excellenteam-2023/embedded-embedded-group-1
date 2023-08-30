@@ -1,6 +1,7 @@
 from flask import Flask, jsonify, request, render_template
 import requests
 
+
 app = Flask(__name__)
 
 received_messages = []
