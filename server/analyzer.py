@@ -13,7 +13,7 @@ def hour_with_most_birds(num_of_days: int) -> [int, float]:
         hour_counts[hour] += entry["birds_sum"]
     most_birds_hour = max(hour_counts, key=hour_counts.get)
 
-    return most_birds_hour, hour_counts[most_birds_hour]/30
+    return most_birds_hour, hour_counts[most_birds_hour]/num_of_days
 
 
 def api_hour_with_most_birds(num_of_days: int = 30) -> str:
@@ -21,11 +21,3 @@ def api_hour_with_most_birds(num_of_days: int = 30) -> str:
     message = f'The time when there were the most birds in the last {num_of_days} days: {most_birds_hour}:00 - {most_birds_hour + 1}:00\n' \
               f'The average number of birds observed at this hour: {average_most_birds}'
     return message
-
-
-def main():
-    print(api_hour_with_most_birds())
-
-
-if __name__ == "__main__":
-    main()
