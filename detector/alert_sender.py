@@ -5,7 +5,7 @@ DOD: a funnction that get num of birds and timstamp and send an http message to 
 import logging
 
 import requests
-from detector.const import SERVER_URL, SERVER_GET_ALERT_PATH, CAMERA_ID
+from const import SERVER_URL, SERVER_GET_ALERT_PATH, CAMERA_ID
 
 
 def send_bird_alert(timestamp, birds_count):

@@ -2,8 +2,10 @@ import logging
 
 from flask import Flask, jsonify, request
 import requests
-from server.server_consts import SERVER_PORT, CLIENT_URL, DETECTOR_URL, DETECTOR_CHANGE_THRESHOLD_PATH
+from server_consts import SERVER_PORT, CLIENT_URL, DETECTOR_URL, DETECTOR_CHANGE_THRESHOLD_PATH
 from db.utils_for_data import store_data
+
+from analyzer import api_hour_with_most_birds, api_hours_with_high_birds_average
 
 app = Flask(__name__)
 
@@ -22,6 +24,24 @@ def listener():
         return jsonify({"message": "alert processed successfully"})
     except Exception as e:
         logging.error(f"Failed to process alert. Error: {e}")
+        return jsonify({"error": str(e)})
+
+
+# function to send report to client when requested
+@app.route('/get_report', methods=['GET'])
+def get_report():
+    """
+    get request from the client to get the report
+    :return: None
+    """
+    try:
+        logging.info(f"Received request from client to get report")
+        message = api_hour_with_most_birds()
+        message += "\n\n"
+        message += api_hours_with_high_birds_average()
+        return jsonify({"message": message})
+    except Exception as e:
+        logging.error(f"Failed to send report. Error: {e}")
         return jsonify({"error": str(e)})
 
 
