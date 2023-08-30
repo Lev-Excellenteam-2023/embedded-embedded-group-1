@@ -8,8 +8,6 @@ from db.utils_for_data import store_data
 app = Flask(__name__)
 
 
-
-
 @app.route('/get_alert', methods=['POST'])
 def listener():
     """
@@ -17,11 +15,10 @@ def listener():
     :return:
     """
     try:
-        logging.info("Received alert from detector.")
         json_data = request.json
+        logging.info(f"Received alert from detector. Data: {json_data}")
         store_data(json_data)
-        # notify_user(json_data)
-        #database.savedata(json_data)
+        notify_user(json_data)
         return jsonify({"message": "alert processed successfully"})
     except Exception as e:
         return jsonify({"error": str(e)})
