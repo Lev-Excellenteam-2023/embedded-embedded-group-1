@@ -2,7 +2,7 @@ import logging
 
 from flask import Flask, jsonify, request
 import requests
-from server_consts import SERVER_PORT, CLIENT_URL, DETECTOR_URL, DETECTOR_CHANGE_THRESHOLD_PATH
+from server_consts import SERVER_PORT, CLIENT_URL, DETECTORS_URLS, DETECTOR_CHANGE_THRESHOLD_PATH
 from db.utils_for_data import store_data
 
 from analyzer import api_hour_with_most_birds, api_hours_with_high_birds_average
@@ -56,13 +56,17 @@ def change_threshold():
         json_data = request.json
         new_threshold = json_data["threshold"]
         logging.info(f"Received request from client to change threshold to {new_threshold}")
-        response = requests.post(f"{DETECTOR_URL}{DETECTOR_CHANGE_THRESHOLD_PATH}", json=json_data)
-        if response.status_code == 200:
-            logging.info("Threshold changed successfully.")
-            return jsonify({"message": "threshold changed successfully"})
-        else:
-            logging.error(f"Failed to change threshold. Status code: {response.status_code}")
-            return jsonify({"error": "failed to change threshold"})
+        failed_to_change = False
+        for detector_url in DETECTORS_URLS:
+            response = requests.post(f"{detector_url}{DETECTOR_CHANGE_THRESHOLD_PATH}", json=json_data)
+            if response.status_code == 200:
+                logging.info("Threshold changed successfully. Detector: %s", detector_url)
+            else:
+                failed_to_change = True
+                logging.error(f"Failed to change threshold. Status code: {response.status_code}, Detector: {detector_url}")
+        if failed_to_change:
+            return jsonify({"error": "Failed to change threshold"})
+        return jsonify({"message": "Threshold updated successfully"})
     except Exception as e:
         logging.error(f"Failed to change threshold. Error: {e}")
         return jsonify({"error": str(e)})
