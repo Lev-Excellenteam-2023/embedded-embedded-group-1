@@ -74,16 +74,12 @@ def change_threshold():
         json_data = request.json
         new_threshold = json_data["threshold"]
         logging.info(f"Received request from client to change threshold to {new_threshold}")
-        failed_to_change = False
         for detector_url in DETECTORS_URLS:
-            response = requests.post(f"{detector_url}{DETECTOR_CHANGE_THRESHOLD_PATH}", json=json_data)
-            if response.status_code == 200:
-                logging.info("Threshold changed successfully. Detector: %s", detector_url)
-            else:
-                failed_to_change = True
-                logging.error(f"Failed to change threshold. Status code: {response.status_code}, Detector: {detector_url}")
-        if failed_to_change:
-            return jsonify({"error": "Failed to change threshold"})
+            try:
+                requests.post(f"{detector_url}{DETECTOR_CHANGE_THRESHOLD_PATH}", json=json_data)
+                logging.info(f"Threshold changed successfully to {new_threshold}. In detector: {detector_url}")
+            except Exception as e:
+                logging.error(f"Failed to change threshold. Error: {e}. In detector: {detector_url}")
         return jsonify({"message": "Threshold updated successfully"})
     except Exception as e:
         logging.error(f"Failed to change threshold. Error: {e}")
