@@ -27,18 +27,36 @@ def listener():
         return jsonify({"error": str(e)})
 
 
-# function to send report to client when requested
-@app.route('/get_report', methods=['GET'])
+@app.route('/get_report', methods=['POST'])
 def get_report():
     """
-    get request from the client to get the report
+    get request from the client to get the hour with the most birds in the recent days
     :return: None
     """
     try:
+        json_data = request.json
+        num_of_days = json_data['numOfDays']
         logging.info(f"Received request from client to get report")
-        message = api_hour_with_most_birds()
+        message = api_hour_with_most_birds(num_of_days)
         message += "\n\n"
-        message += api_hours_with_high_birds_average()
+        return jsonify({"message": message})
+    except Exception as e:
+        logging.error(f"Failed to send report. Error: {e}")
+        return jsonify({"error": str(e)})
+
+@app.route('/get_report_avg', methods=['POST'])
+def get_report_avg():
+    """
+    get request from the client to get the report of the hours
+    with average of observed birds higher than some number
+    :return: None
+    """
+    try:
+        json_data = request.json
+        num_of_birds = json_data['numOfBirds']
+        logging.info(f"Received request from client to get report")
+        message = api_hours_with_high_birds_average(num_of_birds=num_of_birds)
+        message += "\n\n"
         return jsonify({"message": message})
     except Exception as e:
         logging.error(f"Failed to send report. Error: {e}")
@@ -56,16 +74,12 @@ def change_threshold():
         json_data = request.json
         new_threshold = json_data["threshold"]
         logging.info(f"Received request from client to change threshold to {new_threshold}")
-        failed_to_change = False
         for detector_url in DETECTORS_URLS:
-            response = requests.post(f"{detector_url}{DETECTOR_CHANGE_THRESHOLD_PATH}", json=json_data)
-            if response.status_code == 200:
-                logging.info("Threshold changed successfully. Detector: %s", detector_url)
-            else:
-                failed_to_change = True
-                logging.error(f"Failed to change threshold. Status code: {response.status_code}, Detector: {detector_url}")
-        if failed_to_change:
-            return jsonify({"error": "Failed to change threshold"})
+            try:
+                requests.post(f"{detector_url}{DETECTOR_CHANGE_THRESHOLD_PATH}", json=json_data)
+                logging.info(f"Threshold changed successfully to {new_threshold}. In detector: {detector_url}")
+            except Exception as e:
+                logging.error(f"Failed to change threshold. Error: {e}. In detector: {detector_url}")
         return jsonify({"message": "Threshold updated successfully"})
     except Exception as e:
         logging.error(f"Failed to change threshold. Error: {e}")
