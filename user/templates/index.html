@@ -8,27 +8,32 @@
             margin: 0;
             padding: 20px;
         }
+
         header {
             background-color: #333;
             color: #fff;
             padding: 10px;
             text-align: center;
         }
+
         .container {
             display: flex;
             justify-content: space-between;
         }
+
         .messages {
             flex: 1;
         }
-        .threshold {
+
+        .information {
             flex: 1;
             padding: 10px;
             background-color: #f4f4f4;
             border: 1px solid #ccc;
         }
-        .information {
-            flex: 1;
+
+        .threshold {
+            flex: 0.6;
             padding: 10px;
             background-color: #f4f4f4;
             border: 1px solid #ccc;
@@ -36,117 +41,183 @@
     </style>
 </head>
 <body>
-    <header>
-        <h1>Birds Detector</h1>
-    </header>
+<header>
+    <h1>Birds Detector</h1>
+</header>
 
-    <div class="container">
-        <div class="messages">
-            <h2>Received Alerts:</h2>
-            <ul id="message-list"></ul>
-        </div>
-
-        <div class="threshold">
-            <h2>Change Threshold</h2>
-            <input type="number" id="threshold-input" placeholder="Enter threshold">
-            <button id="threshold-button">Set Threshold</button>
-			<div id="updateStatus"></div> 
-
-        </div>
-
-        <div class="information">
-            <h2>Information</h2>
-            <button id="info-button">Show Information</button>
-            <div id="info-box" style="display: none;">
-                <p>This is an information box. You can display additional details here.</p>
-            </div>
-        </div>
+<div class="container">
+    <div class="messages">
+        <h2>Received Alerts:</h2>
+        <ul id="message-list"></ul>
     </div>
 
-    <script>
-        const messageList = document.getElementById('message-list');
+    <div class="threshold">
+        <h2>Change Threshold</h2>
+        <input type="number" id="threshold-input" placeholder="Enter threshold">
+        <button id="threshold-button">Set Threshold</button>
+        <div id="updateStatus"></div>
 
-        const thresholdInput = document.getElementById('threshold-input');
-        const thresholdButton = document.getElementById('threshold-button');
-		const updateStatusDiv = document.getElementById('updateStatus'); // Add this line
+    </div>
 
-        const infoButton = document.getElementById('info-button');
-        const infoBox = document.getElementById('info-box');
+    <div class="information">
+        <h2>Previous information</h2>
+        <div id="explain_box">
+            <p>Enter a number of recent days to display
+                <br>the hour that has the most birds in them </p>
+        </div>
+        <input type="number" id="info-input" placeholder="Enter number">
+        <button id="info-button">Show Information</button>
+        <div id="info-box" style="display: none;">
+            <p>There is no information .</p>
+        </div>
 
-        async function updateMessagesList() {
-            try {
-                const response = await fetch('/get_messages');
-                const data = await response.json();
+        <hr class="profit-line">
 
-                if (response.ok) {
-                    messageList.innerHTML = '';  
+        <div id="explain_box2">
+            <p>Enter a threshold of birds to display the hours
+                <br>when the average number of observed birds is higher:</p>
+        </div>
+        <input type="number" id="info-input2" placeholder="Enter number">
+        <button id="info-button2">Show Information</button>
+        <div id="info-box2" style="display: none;">
+            <p>There is no information .</p>
+        </div>
 
-                    data.messages.forEach(message => {
-                        const li = document.createElement('li');
-                        li.textContent = message;
-                        messageList.appendChild(li);
-                    });
-                }
-            } catch (error) {
-                console.error('Error updating messages list:', error);
+    </div>
+</div>
+
+<script>
+    const messageList = document.getElementById('message-list');
+
+    const thresholdInput = document.getElementById('threshold-input');
+    const thresholdButton = document.getElementById('threshold-button');
+    const updateStatusDiv = document.getElementById('updateStatus');
+
+    const infoInput = document.getElementById('info-input');
+    const infoButton = document.getElementById('info-button');
+    const infoBox = document.getElementById('info-box');
+
+
+    const infoInput2 = document.getElementById('info-input2');
+    const infoButton2 = document.getElementById('info-button2');
+    const infoBox2 = document.getElementById('info-box2');
+
+
+    async function updateMessagesList() {
+        try {
+            const response = await fetch('/get_messages');
+            const data = await response.json();
+
+            if (response.ok) {
+                messageList.innerHTML = '';
+
+                data.messages.forEach(message => {
+                    const li = document.createElement('li');
+                    li.textContent = message;
+                    messageList.appendChild(li);
+                });
             }
+        } catch (error) {
+            console.error('Error updating messages list:', error);
         }
+    }
 
-        updateMessagesList();
-        setInterval(updateMessagesList, 3000);
+    updateMessagesList();
+    setInterval(updateMessagesList, 3000);
 
-        thresholdButton.addEventListener('click', async () => {
-			const inputValue = thresholdInput.value;
-			
-			if (/^\d+$/.test(inputValue) && parseInt(inputValue) > 0) {
-				const newThreshold = parseInt(inputValue);
-				console.log('New threshold:', newThreshold);
+    thresholdButton.addEventListener('click', async () => {
+        const inputValue = thresholdInput.value;
 
-				const response = await fetch('/update_threshold', {
-					method: 'POST',
-					headers: {
-						'Content-Type': 'application/json'
-					},
-					body: JSON.stringify({ threshold: newThreshold })
-				});
+        if (/^\d+$/.test(inputValue) && parseInt(inputValue) > 0) {
+            const newThreshold = parseInt(inputValue);
 
-				if (response.ok) {
-					updateStatusDiv.textContent = 'Update success.';
-					thresholdInput.value = '';
+            const response = await fetch('/update_threshold', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({threshold: newThreshold})
+            });
 
-					setTimeout(() => {
-						updateStatusDiv.textContent = '';
-					}, 3000);
-				} else {
-					console.error('Failed to update threshold on server.');
-				}
-			} else {
-				updateStatusDiv.textContent = 'Please enter a positive number.';
-				setTimeout(() => {
-					updateStatusDiv.textContent = '';
-				}, 3000);
-			}
-			});
+            if (response.ok) {
+                updateStatusDiv.textContent = 'Update success.';
+                thresholdInput.value = '';
 
-		
-	infoButton.addEventListener('click', async () => {
-		// Make an asynchronous request to the Flask route
-		const response = await fetch('/get_info', {
-			method: 'GET',
-			headers: {
-				'Content-Type': 'application/json'
-			}
-		});
+                setTimeout(() => {
+                    updateStatusDiv.textContent = '';
+                }, 3000);
+            } else {
+                console.error('Failed to update threshold on server.');
+            }
+        } else {
+            updateStatusDiv.textContent = 'Please enter a positive number.';
+            setTimeout(() => {
+                updateStatusDiv.textContent = '';
+            }, 3000);
+        }
+    });
 
-		if (response.ok) {
-			// Parse the JSON response and update the infoBox content
-			const data = await response.json();
-			infoBox.textContent = data.info;
-			infoBox.style.display = 'block';
-		} else {
-			console.error('Failed to retrieve info from server.');
-		}
-        });
-    </script>
+
+    infoButton.addEventListener('click', async () => {
+        const inputValue = infoInput.value;
+
+        if (/^\d+$/.test(inputValue) && parseInt(inputValue) > 0) {
+            const numOfDays = parseInt(inputValue);
+            const response = await fetch('/get_info', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({numOfDays: numOfDays})
+            });
+
+            if (response.ok) {
+                const data = await response.json();
+                infoBox.innerHTML = data.info.replace(/\n/g, '<br>');
+                infoBox.style.display = 'block';
+            } else {
+                console.error('Failed to retrieve info from server.');
+            }
+        } else {
+            infoBox.textContent = 'Please enter a positive number.';
+            infoBox.style.display = 'block';
+            infoInput.textContent = '';
+            setTimeout(() => {
+                infoBox.textContent = '';
+            }, 3000);
+        }
+    });
+
+
+    infoButton2.addEventListener('click', async () => {
+        const inputValue = infoInput2.value;
+
+        if (/^\d+$/.test(inputValue) && parseInt(inputValue) > 0) {
+            const numOfBirds = parseInt(inputValue);
+            const response = await fetch('/get_info_avg', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({numOfBirds: numOfBirds})
+            });
+
+            if (response.ok) {
+                const data = await response.json();
+                infoBox2.innerHTML = data.info.replace(/\n/g, '<br>');
+                infoBox2.style.display = 'block';
+            } else {
+                console.error('Failed to retrieve info from server.');
+            }
+        } else {
+            infoBox2.textContent = 'Please enter a positive number.';
+            infoBox2.style.display = 'block';
+            infoInput2.textContent = '';
+            setTimeout(() => {
+                infoBox2.textContent = '';
+            }, 3000);
+        }
+    });
+</script>
 </body>
 </html>

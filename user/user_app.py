@@ -3,7 +3,7 @@ import logging
 from flask import Flask, jsonify, request, render_template
 import requests
 
-from user.consts import SERVER_URL, SERVER_CHANGE_THR_PATH, SERVER_GET_REPO_PATH
+from user.consts import SERVER_URL, SERVER_CHANGE_THR_PATH, SERVER_GET_REPO_PATH, SERVER_GET_REPO_AVG_PATH
 
 app = Flask(__name__)
 
@@ -57,14 +57,33 @@ def update_threshold():
         return jsonify({"error": str(e)})
 
 
-@app.route('/get_info', methods=['GET'])
+@app.route('/get_info', methods=['POST'])
 def get_info():
     """
-    send request from to the server to get report and print it
+    send request to the server to get the hour with the most birds in the recent days
     :return:
     """
     try:
-        response = requests.get(f"{SERVER_URL}{SERVER_GET_REPO_PATH}")
+        data = request.get_json()
+        response = requests.post(f"{SERVER_URL}{SERVER_GET_REPO_PATH}", json=data)
+        response_data = response.json()
+        updated_info = response_data.get("message", "No information available")
+        logging.info(f"info received: {updated_info}")
+        return jsonify({"info": updated_info})
+    except Exception as e:
+        return jsonify({"error": str(e)})
+
+
+@app.route('/get_info_avg', methods=['POST'])
+def get_info_avg():
+    """
+    request to the server to get the report of the hours
+    with average of observed birds higher than some number and print it
+    :return:
+    """
+    try:
+        data = request.get_json()
+        response = requests.post(f"{SERVER_URL}{SERVER_GET_REPO_AVG_PATH}", json=data)
         response_data = response.json()
         updated_info = response_data.get("message", "No information available")
         logging.info(f"info received: {updated_info}")
